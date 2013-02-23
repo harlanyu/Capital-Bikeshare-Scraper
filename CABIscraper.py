@@ -33,7 +33,10 @@ br.select_form(predicate=lambda f: 'id' in f.attrs and f.attrs['id'] == 'login-f
 br["username"] = "" #<-- enter your username here
 br["password"] = "" #<-- enter your password here
 
+print "Logging in..."
 response1 = br.submit().read()
+
+print "Parsing response..."
 soup = BeautifulSoup.BeautifulSoup(response1)
 acct_num = soup.find(text="Account Number").findNext("td").string
 
@@ -44,7 +47,7 @@ print "Downloading data for account number %s..." % acct_num
 output = "Trip Number | Start Station | Start Date | End Station | End Date | Duration | Cost | Distance (miles) | Calories Burned | CO2 Offset (lbs.)\n"
 
 # fetch main Rental History page
-response1 = br.open("https://www.capitalbikeshare.com/user/view_rentals/")
+response1 = br.open("https://www.capitalbikeshare.com/member/rentals/")
 
 while True:
 
