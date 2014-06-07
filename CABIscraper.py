@@ -11,20 +11,16 @@
 
 # importing libs
 import sys, getopt, re, BeautifulSoup, mechanize
+import csv
 
 def parse_table(ride_table):
-
-	output = ""
-	rows = ride_table.findAll("tr")[1:]
-	for row in rows:
+	for row in ride_table.findAll("tr")[1:]:
+		output_row = []
 		for col in row.findAll("td"):
-			output += col.string.strip() + " | "
-		output = output[:-3] + "\n"
-
-	return output
+			output_row.append(col.string.strip())
+		yield output_row
 
 def main(argv):
-
 	br = mechanize.Browser()
 	br.open("https://www.capitalbikeshare.com/login") #login page
 	br.select_form(predicate=lambda f: 'id' in f.attrs and f.attrs['id'] == 'login-form') #form name
@@ -48,42 +44,42 @@ def main(argv):
 	     br["password"] = arg
 
 	# Log-in.
-
 	print "Logging in with username {0} password {1}".format(br["username"],br["password"])
 	response1 = br.submit().read()
 
-	print "Parsing response..."
+	print "Retrieving account information..."
 	soup = BeautifulSoup.BeautifulSoup(response1)
 	acct_num = soup.find(text="Account Number").findNext("td").string
 
 	print "Downloading data for account number %s..." % acct_num
 
 	# Fetch ride data.
-
-	output = "Trip Number | Start Station | Start Date | End Station | End Date | Duration | Cost | Distance (miles) | Calories Burned | CO2 Offset (lbs.)\n"
-
+	header_row = ["Trip Number", "Start Station", "Start Date", "End Station", "End Date", "Duration", "Cost", "Distance (miles)", "Calories Burned", "CO2 Offset (lbs.)"]
+	
 	# fetch main Rental History page
 	response1 = br.open("https://www.capitalbikeshare.com/member/rentals/")
 
-	while True:
-
-		soup = BeautifulSoup.BeautifulSoup(response1)
-		ride_table = soup.find(id="content").findAll("table")[1]
-
-		output += parse_table(ride_table)
-
-		# try to fetch another Rental History page
-		try:
-			response1 = br.follow_link(text_regex=r">", nr=1).read()
-		except:
-			break
-
+	# start output file
 	filename = "cabi_log_%s.csv" % acct_num
-	print "Writing to file '%s'... " % filename,
-	output_file = open(filename, "w")
-	output_file.write(output)
-	output_file.close()
-	print "done!"
+	with open(filename, 'wb') as outputfile:
+		csvwriter = csv.writer(outputfile, delimiter="|")
+		csvwriter.writerow(header_row)
+
+		while True:
+			print "Parsing results for another page of trip history"
+			soup = BeautifulSoup.BeautifulSoup(response1)
+			ride_table = soup.find(id="content").findAll("table")[1]
+
+			for row in parse_table(ride_table):
+				csvwriter.writerow(row)
+
+			# try to fetch another Rental History page
+			try:
+				response1 = br.follow_link(text_regex=r">", nr=1).read()
+			except:
+				break
+
+	print "Done!"
 
 if __name__ == "__main__":
    main(sys.argv[1:])
