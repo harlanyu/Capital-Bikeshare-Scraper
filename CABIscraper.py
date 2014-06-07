@@ -54,7 +54,7 @@ def main(argv):
 	print "Downloading data for account number %s..." % acct_num
 
 	# Fetch ride data.
-	header_row = ["Trip Number", "Start Station", "Start Date", "End Station", "End Date", "Duration", "Cost", "Distance (miles)", "Calories Burned", "CO2 Offset (lbs.)"]
+	header_row = ["Start Station", "Start Date", "End Station", "End Date", "Duration", "Cost", "Distance (miles)", "Calories Burned", "CO2 Offset (lbs.)"]
 	
 	# fetch main Rental History page
 	response1 = br.open("https://www.capitalbikeshare.com/member/rentals/")
