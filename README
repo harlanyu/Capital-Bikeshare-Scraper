@@ -1,7 +1,7 @@
 Capital Bikeshare (CABI) Usage Python Screen Scrapper
 
 Re-purposed by Harlan Yu (@harlanyu) for Capital Bikeshare; 
-code originally written by Justin Grimes (@justgrimes) & Josh Tauberer (@joshdata) for scraping WMATA data (https://github.com/justgrimes/WMATA-SmarTrip-Scrapper)
+code originally written by Justin Grimes (@justgrimes) & Josh Tauberer (@joshdata) for scraping WMATA data (https://github.com/justgrimes/WMATA-SmarTrip-Scraper)
 
 Simple python script that scrapes a CABI user's transit usage data 
 Script extracts data from HTML tables using Beautiful Soup library then writes lovely clean CSV files.
